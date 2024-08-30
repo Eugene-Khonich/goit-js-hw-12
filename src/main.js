@@ -23,7 +23,7 @@ const onSearchSubmit = async e => {
   e.preventDefault();
   loader.classList.remove('hidden');
   value = e.target.elements.inputField.value.toLowerCase().trim();
-  page = 33;
+  page = 1;
   if (!value) {
     iziToast.error({
       title: 'Error',
