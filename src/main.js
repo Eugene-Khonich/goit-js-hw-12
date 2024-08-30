@@ -21,8 +21,9 @@ let perPage = 15;
 
 const onSearchSubmit = async e => {
   e.preventDefault();
+  loader.classList.remove('hidden');
   value = e.target.elements.inputField.value.toLowerCase().trim();
-  page = 1;
+  page = 33;
   if (!value) {
     iziToast.error({
       title: 'Error',
@@ -31,21 +32,22 @@ const onSearchSubmit = async e => {
     });
     return;
   }
-  loader.classList.remove('hidden');
   try {
     const response = await fetchPhotos(value, page);
-    if (response.data.total === 0) {
+    if (response.hits.length === 0) {
       iziToast.error({
         message:
           'Sorry, there are no images matching your search query. Please try again!',
         position: 'topRight',
       });
       loader.classList.add('hidden');
+      loadMore.classList.add('hidden');
       galleryList.innerHTML = '';
       form.reset();
       return;
     } else {
-      greateCards(response.data.hits);
+      galleryList.innerHTML = '';
+      greateCards(response.hits);
       lightBox.refresh();
       loader.classList.add('hidden');
       loadMore.classList.remove('hidden');
@@ -64,11 +66,9 @@ const onLoadMoreClick = async e => {
     loadMore.classList.add('hidden');
     loader.classList.remove('hidden');
     const response = await fetchPhotos(value, page);
-    greateCards(response.data.hits);
-    totalPages = response.data.totalHits;
-    console.log(response);
-    console.log(page);
-    console.log(totalPages);
+    greateCards(response.hits);
+    lightBox.refresh();
+    totalPages = response.totalHits;
     if (page * perPage >= totalPages) {
       iziToast.error({
         message: "We're sorry, but you've reached the end of search results.",
@@ -76,6 +76,7 @@ const onLoadMoreClick = async e => {
       });
       loadMore.classList.add('hidden');
       loader.classList.add('hidden');
+      lightBox.refresh();
       return;
     }
     const galleryCard = galleryList.querySelector('.gallery-item');
